@@ -22,7 +22,7 @@
 
       h1 {
         text-align: center;
-        color: #002E6D;
+        color: #002e6d;
         margin-bottom: 30px;
         font-size: 2.5rem;
       }
@@ -54,7 +54,7 @@
       }
 
       #upload-form button {
-        background-color: #002E6D;
+        background-color: #002e6d;
         color: #fff;
         font-size: 1.1rem;
         padding: 12px 20px;
@@ -102,18 +102,18 @@
         }
       }
       .footer {
-          background-color: #002E6D; /* Mesmo fundo azul do título */
-          color: white;
-          text-align: center;
-          padding: 5px 0;
-          position: fixed;
-          bottom: 0;
-          width: 100%;
-          left: 0;
-          right: 0;
-          z-index: 100;
-          font-size: 12px;
-          }
+        background-color: #002e6d; /* Mesmo fundo azul do título */
+        color: white;
+        text-align: center;
+        padding: 5px 0;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        font-size: 12px;
+      }
     </style>
   </head>
   <body>
@@ -128,6 +128,16 @@
     <pre id="output"></pre>
 
     <script>
+      function removerAcentos(texto) {
+        return texto
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "") // Remove todos os diacríticos, incluindo acentos e til
+          .replace(/Ç/g, "C") // Substitui Ç por C
+          .replace(/ç/g, "c") // Substitui ç por c
+          .replace(/[~´]/g, "") // Remove til (~) e acento agudo (´) isolados,
+          .replace(/[^\w\s]/g, "") // Remove outros caracteres especiais, mantendo letras, números e espaços
+      }
+
       function convertToCNAB400() {
         const fileInput = document.getElementById("xml-file")
         if (!fileInput.files.length) {
@@ -218,30 +228,39 @@
                 "CNPJ",
               )[0]?.textContent || ""
 
-          const nomeSacado =
+          const nomeSacado = removerAcentos(
             xmlDoc.getElementsByTagNameNS(
               "http://www.portalfiscal.inf.br/nfe",
               "xNome",
-            )[1]?.textContent || ""
+            )[1]?.textContent || "",
+          )
+
           const enderecoSacado = xmlDoc.getElementsByTagNameNS(
             "http://www.portalfiscal.inf.br/nfe",
             "enderDest",
           )[0]
-          const logradouro =
+
+          const logradouro = removerAcentos(
             enderecoSacado?.getElementsByTagNameNS(
               "http://www.portalfiscal.inf.br/nfe",
               "xLgr",
-            )[0]?.textContent || ""
-          const numero =
+            )[0]?.textContent || "",
+          )
+
+          const numero = removerAcentos(
             enderecoSacado?.getElementsByTagNameNS(
               "http://www.portalfiscal.inf.br/nfe",
               "nro",
-            )[0]?.textContent || ""
-          const bairro =
+            )[0]?.textContent || "",
+          )
+
+          const bairro = removerAcentos(
             enderecoSacado?.getElementsByTagNameNS(
               "http://www.portalfiscal.inf.br/nfe",
               "xBairro",
-            )[0]?.textContent || ""
+            )[0]?.textContent || "",
+          )
+
           const cep =
             enderecoSacado?.getElementsByTagNameNS(
               "http://www.portalfiscal.inf.br/nfe",
@@ -347,8 +366,8 @@
             detalheLine = detalheLine.padEnd(399) // Completa com espaços até a posição 399
             detalheLine += preencherCampo(chaveDanfe, 44) // Chave DANFE - Posição 400 a 444
             cnabContent += detalheLine + "\n" // Adiciona linha de detalhe ao conteúdo
-            lineNumber++ // Incrementa o número da linha
             detalheLine += preencherCampo(chaveDanfe, 44) // Chave DANFE - Posição 400 a 444
+            lineNumber++ // Incrementa o número da linha
           }
 
           filesProcessed++
